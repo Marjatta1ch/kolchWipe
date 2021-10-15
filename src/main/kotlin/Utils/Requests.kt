@@ -25,7 +25,9 @@ class Requests {
             .build()
 
         val response = client.newCall(request).execute()
-
+        if(!response.isSuccessful){
+            throw IOException()
+        }
         for ((name, value) in response.headers) {
             if (name.contains("set-cookie")) {
                 if (value.contains("key=")) {
@@ -38,7 +40,7 @@ class Requests {
         }
         val rsp = response.body!!.string()
         if(rsp.contains("https://www.cloudflare.com/5xx-error-landing/") && rsp.contains("Please turn JavaScript on and reload the page.") && rsp.contains("DDoS protection by")){
-            ThreadDeath()
+            throw IOException()
         }
         return (cookies)
     }
@@ -65,12 +67,20 @@ class Requests {
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0")
             .header("Cookie", "key=$key; homeboard=krautchan.net; PHPSESSID=$PHPSESSID")
             .build()
+        val rsp = OkHttpClient().newBuilder().proxy(proxyWipe).retryOnConnectionFailure(true).build().newCall(request).execute()
+        if(!rsp.isSuccessful){
+            throw IOException()
+        }
+        val image = Base64.getEncoder().encodeToString(rsp.body!!.bytes())
 
-        val image = Base64.getEncoder().encodeToString(OkHttpClient().newBuilder().proxy(proxyWipe).retryOnConnectionFailure(true).build().newCall(request).execute().body!!.bytes())
         val requestCaptcha = Request.Builder()
             .url("http://127.0.0.1:5000/solve?image=${URLEncoder.encode(image)}")
             .build()
-        return OkHttpClient().newCall(requestCaptcha).execute().body!!.string().substringAfter("\"").substringBefore("\"")
+        val respCaptch = OkHttpClient().newCall(requestCaptcha).execute()
+        if(!respCaptch.isSuccessful){
+            throw IOException()
+        }
+        return respCaptch.body!!.string().substringAfter("\"").substringBefore("\"")
     }
 
     fun sendNew(proxyIp: String, proxyPort: Pair<Int, String>){
@@ -90,7 +100,7 @@ class Requests {
             .addFormDataPart("title", "КАЛОВАЯ ОТСИРАЛЬНАЯ")//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
             .addFormDataPart("link", "https://2.0-chan.ru/")
             .addFormDataPart("text", "ПРРРРРРРРРРРРРРРРРРРРРРРРРРР ПССССССССССССССССССССССССССС [:6Y1xrpY:]")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
-            .addFormDataPart("text_full", "КАЛОВАЯ ОТСИРАЛЬНАЯ")//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
+            .addFormDataPart("text_full", "ПОСРАЛ В КОЛЧОК НЕ СМЫЛ БОЧОК")//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
             .addFormDataPart("captcha_key", "post")
             .addFormDataPart("captcha", solveCaptcha(keyPHPSESSID.first, keyPHPSESSID.second, proxyIp, proxyPort))
             .build()

@@ -46,11 +46,17 @@ fun main(args: Array<String>) {
                 val prx = proxsMap.entries.shuffled().first()
                 req.sendNew(prx.key, prx.value)
                 } catch (e: SocketException) {
+                    ThreadDeath()
                 } catch (e: SocketTimeoutException) {
+                    ThreadDeath()
                 } catch (e: UnknownHostException) {
+                    ThreadDeath()
                 } catch (e: SSLProtocolException) {
+                    ThreadDeath()
                 } catch (e: javax.net.ssl.SSLHandshakeException) {
+                    ThreadDeath()
                 } catch (E: java.io.IOException) {
+                    ThreadDeath()
                 }
             }.start()
         sleep(10)
