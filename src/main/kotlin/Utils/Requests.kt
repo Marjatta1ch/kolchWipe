@@ -1,11 +1,14 @@
 package Utils
 
 import okhttp3.*
+import java.io.File
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URLEncoder
 import java.util.*
+
+val psts = File("doto").readLines() + File("dt").readLines() + File("plaksa").readLines() + File("okor").readLines() + File("kudah").readLines()
 
 class Requests {
 
@@ -26,6 +29,7 @@ class Requests {
 
         val response = client.newCall(request).execute()
         if(!response.isSuccessful){
+            response.body!!.close()
             throw IOException()
         }
         for ((name, value) in response.headers) {
@@ -69,6 +73,7 @@ class Requests {
             .build()
         val rsp = OkHttpClient().newBuilder().proxy(proxyWipe).retryOnConnectionFailure(true).build().newCall(request).execute()
         if(!rsp.isSuccessful){
+            rsp.body!!.close()
             throw IOException()
         }
         val image = Base64.getEncoder().encodeToString(rsp.body!!.bytes())
@@ -78,6 +83,7 @@ class Requests {
             .build()
         val respCaptch = OkHttpClient().newCall(requestCaptcha).execute()
         if(!respCaptch.isSuccessful){
+            respCaptch.body!!.close()
             throw IOException()
         }
         return respCaptch.body!!.string().substringAfter("\"").substringBefore("\"")
@@ -97,10 +103,10 @@ class Requests {
             .addFormDataPart("email", "")
             .addFormDataPart("homeboard", "krautchan.net")
             .addFormDataPart("category", "")
-            .addFormDataPart("title", "КАЛОВАЯ ОТСИРАЛЬНАЯ")//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
-            .addFormDataPart("link", "https://2.0-chan.ru/")
-            .addFormDataPart("text", "ПРРРРРРРРРРРРРРРРРРРРРРРРРРР ПССССССССССССССССССССССССССС [:6Y1xrpY:]")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
-            .addFormDataPart("text_full", "ПОСРАЛ В КОЛЧОК НЕ СМЫЛ БОЧОК")//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
+            .addFormDataPart("title", psts.random().take(69))//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
+            .addFormDataPart("link", "")
+            .addFormDataPart("text", "${psts.random().take(900)} [:6Y1xrpY:]")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
+            .addFormDataPart("text_full", psts.random().take(900))//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
             .addFormDataPart("captcha_key", "post")
             .addFormDataPart("captcha", solveCaptcha(keyPHPSESSID.first, keyPHPSESSID.second, proxyIp, proxyPort))
             .build()

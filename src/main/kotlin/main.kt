@@ -41,24 +41,30 @@ fun main(args: Array<String>) {
     }
 
     while (true) {
-            Thread{
-                try {
-                val prx = proxsMap.entries.shuffled().first()
+        Thread {
+            val prx = proxsMap.entries.shuffled().first()
+            try {
                 req.sendNew(prx.key, prx.value)
-                } catch (e: SocketException) {
-                    ThreadDeath()
-                } catch (e: SocketTimeoutException) {
-                    ThreadDeath()
-                } catch (e: UnknownHostException) {
-                    ThreadDeath()
-                } catch (e: SSLProtocolException) {
-                    ThreadDeath()
-                } catch (e: javax.net.ssl.SSLHandshakeException) {
-                    ThreadDeath()
-                } catch (E: java.io.IOException) {
-                    ThreadDeath()
-                }
-            }.start()
-        sleep(10)
+            } catch (e: SocketException) {
+            } catch (e: SocketTimeoutException) {
+            } catch (e: UnknownHostException) {
+            } catch (e: SSLProtocolException) {
+            } catch (e: javax.net.ssl.SSLHandshakeException) {
+            } catch (E: java.io.IOException) {
+            }
+        }.start()
+        Thread {
+            val prx = proxsMap.entries.shuffled().first()
+            try {
+                req.sendNew(prx.key, prx.value)
+            } catch (e: SocketException) {
+            } catch (e: SocketTimeoutException) {
+            } catch (e: UnknownHostException) {
+            } catch (e: SSLProtocolException) {
+            } catch (e: javax.net.ssl.SSLHandshakeException) {
+            } catch (E: java.io.IOException) {
+            }
+        }.start()
+        sleep(25)
     }
 }
