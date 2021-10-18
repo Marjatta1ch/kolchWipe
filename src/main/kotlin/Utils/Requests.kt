@@ -115,6 +115,7 @@ class Requests {
             posts.add("2062243")
             posts.add("2060310")
             posts.add("2059564")
+            posts.add("2094008")
         }
         return (Pair(cookies, posts))
     }

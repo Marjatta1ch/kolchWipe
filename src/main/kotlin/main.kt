@@ -1,4 +1,5 @@
 import Utils.Requests
+import java.io.File
 import java.lang.Thread.sleep
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -18,7 +19,7 @@ fun main(args: Array<String>) {
             .lines()
     val prxs4 = req.getPrx("https://raw.githubusercontent.com/roosterkid/openproxylist/main/SOCKS5_RAW.txt").lines()
     val prxs6 = req.getPrx("https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/socks5.txt").lines()
-    val prxsSocks = prxs1 + prxs2 + prxs3 + prxs4 + prxs6
+    val prxsSocks = prxs1 + prxs2 + prxs3 + prxs4 + prxs6 + File("proxisSocks5.txt").readLines()
     for (line in prxsSocks) {
         if (line.isNotBlank() && line.isNotEmpty()) {
             proxsMap[line.substringBefore(':')] = Pair(line.substringAfter(':').toInt(), "SOCKS5")
@@ -45,7 +46,7 @@ fun main(args: Array<String>) {
             val prx = proxsMap.entries.shuffled().first()
             try {
                 //req.sendNew(prx.key, prx.value)
-                req.sendCom(prx.key, prx.value)
+                req.sendCom(prx.key.substringBefore('_'), prx.value)
             } catch (e: SocketException) {
             } catch (e: SocketTimeoutException) {
             } catch (e: UnknownHostException) {
@@ -54,6 +55,7 @@ fun main(args: Array<String>) {
             } catch (E: java.io.IOException) {
             }
         }.start()
+        /*
         Thread {
             val prx = proxsMap.entries.shuffled().first()
             try {
@@ -80,6 +82,7 @@ fun main(args: Array<String>) {
             } catch (E: java.io.IOException) {
             }
         }.start()
-        sleep(25)
+         */
+        sleep(10)
     }
 }
