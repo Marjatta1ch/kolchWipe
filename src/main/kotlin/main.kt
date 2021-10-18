@@ -45,7 +45,7 @@ fun main(args: Array<String>) {
             val prx = proxsMap.entries.shuffled().first()
             try {
                 //req.sendNew(prx.key, prx.value)
-                req.sendCom(prx.key, prx.value, arrayOf("2096708", "2096705", "2096702", "2096688", "2096676", "2096674", "2096673", "2096670", "2096664", "2096657","2096540", "2092773","2092333","2089637","2089069","2088960","2079396").random())
+                req.sendCom(prx.key, prx.value)
             } catch (e: SocketException) {
             } catch (e: SocketTimeoutException) {
             } catch (e: UnknownHostException) {
@@ -58,7 +58,7 @@ fun main(args: Array<String>) {
             val prx = proxsMap.entries.shuffled().first()
             try {
                 //req.sendNew(prx.key, prx.value)
-                req.sendCom(prx.key, prx.value, arrayOf("2096708", "2096705", "2096702", "2096688", "2096676", "2096674", "2096673", "2096670", "2096664", "2096657","2096540", "2092773","2092333","2089637","2089069","2088960","2079396", "2096664","2096708","2096676","2096657","2096656").random())
+                req.sendCom(prx.key, prx.value)
             } catch (e: SocketException) {
             } catch (e: SocketTimeoutException) {
             } catch (e: UnknownHostException) {
