@@ -59,7 +59,7 @@ class Requests {
         return response.body!!.string()
     }
 
-    fun solveCaptcha(key: String, PHPSESSID: String, proxyIp: String, proxyPort: Pair<Int, String>): String{
+    fun solveCaptcha(key: String, PHPSESSID: String, proxyIp: String, proxyPort: Pair<Int, String>, is_com: Boolean = false): String{
         val proxyWipe = if(proxyPort.second == "SOCKS5") {
             Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(proxyIp, proxyPort.first))
         } else {
@@ -67,7 +67,7 @@ class Requests {
         }
 
         val request = Request.Builder()
-            .url("https://1chan.top/captcha/?key=post&PHPSESSID=$PHPSESSID")
+            .url(if(!is_com)"https://1chan.top/captcha/?key=post&PHPSESSID=$PHPSESSID" else "https://1chan.top/captcha/?key=comment&PHPSESSID=$PHPSESSID")
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0")
             .header("Cookie", "key=$key; homeboard=krautchan.net; PHPSESSID=$PHPSESSID")
             .build()
@@ -105,7 +105,7 @@ class Requests {
             .addFormDataPart("category", "")
             .addFormDataPart("title", psts.random().take(69))//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
             .addFormDataPart("link", "")
-            .addFormDataPart("text", "${psts.random().take(900)} [:6Y1xrpY:]")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
+            .addFormDataPart("text", "${psts.random().take(900)}")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
             .addFormDataPart("text_full", psts.random().take(900))//"НЯШНЫЙ+ЧАТИК+НЯШУЛИЕВ")
             .addFormDataPart("captcha_key", "post")
             .addFormDataPart("captcha", solveCaptcha(keyPHPSESSID.first, keyPHPSESSID.second, proxyIp, proxyPort))
@@ -116,6 +116,36 @@ class Requests {
             .header("Referer", "https://1chan.top/news/")
             .header("Cookie", "PHPSESSID=${keyPHPSESSID.second}; key=${keyPHPSESSID.first}; homeboard=krautchan.net")
             .url("https://1chan.top/news/add/")
+            .post(requestBody)
+            .build()
+
+        OkHttpClient().newBuilder().proxy(proxyWipe).retryOnConnectionFailure(true).build().newCall(request).execute().body!!.close()
+    }
+
+    fun sendCom(proxyIp: String, proxyPort: Pair<Int, String>, post: String){
+        val proxyWipe = if(proxyPort.second == "SOCKS5") {
+            Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(proxyIp, proxyPort.first))
+        } else {
+            Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(proxyIp, proxyPort.first))
+        }
+
+        val keyPHPSESSID = getCookies(proxyIp, proxyPort)
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("email", "")
+            .addFormDataPart("homeboard", "krautchan.net")
+            .addFormDataPart("post_id", post)
+            .addFormDataPart("text", "${psts.random().take(900)}")//"Няшулий,+прмсоединяйся+к+няшному+чату+няшулиев ")
+            .addFormDataPart("captcha_key", "comment")
+            .addFormDataPart("captcha", solveCaptcha(keyPHPSESSID.first, keyPHPSESSID.second, proxyIp, proxyPort, is_com = true))
+            .build()
+
+        val request = Request.Builder()
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0")
+            .header("Referer", "https://1chan.top/news/")
+            .header("Cookie", "PHPSESSID=${keyPHPSESSID.second}; key=${keyPHPSESSID.first}; homeboard=krautchan.net")
+            .url("https://1chan.top/news/res/$post/add_comment/")
             .post(requestBody)
             .build()
 
